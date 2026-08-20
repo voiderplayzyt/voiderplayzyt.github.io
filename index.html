@@ -1,0 +1,267 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Nothing Here!</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: 100dvh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-family: Arial, Helvetica, sans-serif;
+            color: white;
+
+            overflow-x: hidden;
+
+            /* Cool animated background */
+            background:
+                radial-gradient(circle at 20% 20%, #5b21b6 0%, transparent 35%),
+                radial-gradient(circle at 80% 80%, #0369a1 0%, transparent 35%),
+                linear-gradient(135deg, #020617, #0f172a, #111827);
+
+            position: relative;
+        }
+
+        /* Background glow */
+        body::before {
+            content: "";
+            position: fixed;
+            width: 500px;
+            height: 500px;
+
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 50%;
+
+            filter: blur(100px);
+
+            animation: float 8s ease-in-out infinite alternate;
+
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            from {
+                transform: translate(-100px, -50px);
+            }
+
+            to {
+                transform: translate(100px, 50px);
+            }
+        }
+
+        .container {
+            width: min(90%, 900px);
+
+            text-align: center;
+
+            padding: 40px 20px;
+
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 900;
+
+            margin-bottom: 30px;
+
+            letter-spacing: -2px;
+
+            text-shadow:
+                0 0 20px rgba(255, 255, 255, 0.25),
+                0 0 50px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Main button */
+        .show-button {
+            border: none;
+
+            padding: 15px 25px;
+
+            border-radius: 12px;
+
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            font-weight: bold;
+
+            cursor: pointer;
+
+            backdrop-filter: blur(10px);
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .show-button:hover {
+            transform: translateY(-3px);
+
+            background: rgba(255, 255, 255, 0.18);
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(99, 102, 241, 0.25);
+        }
+
+        .show-button:active {
+            transform: scale(0.96);
+        }
+
+        /* Hidden website buttons */
+        .website-list {
+            display: none;
+
+            margin-top: 30px;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(180px, 1fr));
+
+            gap: 15px;
+
+            width: 100%;
+        }
+
+        .website-list.show {
+            display: grid;
+        }
+
+        .website-button {
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            min-height: 55px;
+
+            padding: 12px 18px;
+
+            border-radius: 12px;
+
+            text-decoration: none;
+
+            color: white;
+
+            font-weight: bold;
+
+            background: rgba(255, 255, 255, 0.08);
+
+            border: 1px solid rgba(255, 255, 255, 0.15);
+
+            backdrop-filter: blur(10px);
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .website-button:hover {
+            transform: translateY(-4px);
+
+            background: rgba(255, 255, 255, 0.16);
+
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .website-button:active {
+            transform: scale(0.96);
+        }
+
+        /* Small screens */
+        @media (max-width: 500px) {
+            .container {
+                width: 92%;
+            }
+
+            .website-list {
+                grid-template-columns: 1fr;
+            }
+
+            .show-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <h1>Nothing Here!</h1>
+
+        <button class="show-button" onclick="toggleWebsites()">
+            Click here to see all website
+        </button>
+
+        <!--
+            ADD NEW WEBSITES HERE
+
+            Just copy one of these:
+
+            <a class="website-button"
+               href="https://example.com"
+               target="_blank">
+                Example
+            </a>
+
+            The grid automatically handles the size and position.
+        -->
+
+        <div class="website-list" id="websiteList">
+
+            <a class="website-button"
+               href="https://example.com"
+               target="_blank">
+                Example Website
+            </a>
+
+            <a class="website-button"
+               href="https://github.com"
+               target="_blank">
+                GitHub
+            </a>
+
+            <!-- COPY THIS -->
+            <a class="website-button"
+               href="https://google.com"
+               target="_blank">
+                Google
+            </a>
+
+        </div>
+
+    </main>
+
+    <script>
+        function toggleWebsites() {
+            const websiteList = document.getElementById("websiteList");
+
+            websiteList.classList.toggle("show");
+        }
+    </script>
+
+</body>
+</html>
+```
