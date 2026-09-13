@@ -1,102 +1,272 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BABFT Mass & Pivot Calculator</title>
 <style>
-*{box-sizing:border-box}body{margin:0;padding:24px;background:#070b14;color:#edf5ff;font:15px system-ui,sans-serif}
-main{max-width:1000px;margin:auto}.tag{color:#51e7ff;font-size:11px;font-weight:800;letter-spacing:2px}
-h1{margin:5px 0;font-size:30px}p,.help{color:#8997ad}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-.card{background:#101827;border:1px solid #26344d;border-radius:18px;padding:18px;box-shadow:0 10px 35px #0005}
-h2{font-size:16px;margin:0 0 12px}label{display:block;color:#9aa8bd;font-size:12px;margin:10px 0 5px}
-input,select{width:100%;height:44px;border-radius:10px;border:1px solid #2b3b58;background:#080e19;color:#fff;padding:9px 11px;font-size:15px}
-input:focus,select:focus{outline:2px solid #51e7ff55;border-color:#51e7ff}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.full{grid-column:1/-1}
-.results{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{background:#080e19;border:1px solid #26344d;border-radius:13px;padding:13px}
-.k{font-size:10px;color:#8997ad;text-transform:uppercase;letter-spacing:1px}.v{font-size:20px;font-weight:900;margin-top:3px;overflow-wrap:anywhere}
-.good .v{color:#63ee9e}.gold .v{color:#ffd56a}
-button{height:44px;border:0;border-radius:10px;padding:0 18px;background:linear-gradient(100deg,#718cff,#51e7ff);font-weight:900;cursor:pointer}
-button.alt{background:#182238;color:#fff;border:1px solid #2b3b58}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
-.formula{margin-top:12px;background:#080d17;border:1px solid #26344d;border-radius:12px;padding:12px;font:12px ui-monospace,monospace;color:#dce7f8;line-height:1.7}
-svg{width:100%;display:block;background:#080d17;border-radius:12px}.status{color:#9aa8bd;font-size:12px;margin-top:10px;min-height:18px}
-@media(max-width:720px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.results{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}body{padding:12px}}
-</style></head>
-<body><main>
-<div class="tag">BABFT • PHYSICS LAB</div>
-<h1>Mass & Pivot Calculator</h1>
-<p>Balance a beam around a pivot and calculate required counterweight mass, density, torque, volume, and center of mass.</p>
+*{box-sizing:border-box}
+:root{--bg:#060912;--panel:#0e1625;--panel2:#09111e;--line:#263752;--text:#eef6ff;--muted:#8998ae;--cyan:#50e8ff;--blue:#738dff;--green:#62efa0;--red:#ff7188;--gold:#ffd66d}
+body{margin:0;padding:24px;background:radial-gradient(circle at 12% 0%,#163a7055,transparent 30%),radial-gradient(circle at 92% 8%,#00677a44,transparent 28%),linear-gradient(145deg,#050711,#0a111e 55%,#050812);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:1120px;margin:auto}
+header{margin-bottom:24px}.tag{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:2.5px}h1{font-size:32px;margin:5px 0}.sub{color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.full{grid-column:1/-1}
+.card{background:linear-gradient(155deg,#111a2ae8,#0b1220e8);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 38px #0005}
+h2{font-size:16px;margin:0 0 13px}h3{font-size:14px;margin:0}
+label{display:block;color:var(--muted);font-size:11px;font-weight:800;margin:10px 0 5px}
+input,select{width:100%;height:43px;border:1px solid #2a3b59;background:#080e18;color:var(--text);border-radius:10px;padding:9px 11px;font-size:15px;outline:none}
+input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #50e8ff12}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.results{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.metric{background:#080e18;border:1px solid var(--line);border-radius:13px;padding:13px;min-width:0}
+.k{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px}.v{font-size:20px;font-weight:900;margin-top:3px;overflow-wrap:anywhere}
+.good .v{color:var(--green)}.warn .v{color:var(--gold)}.bad .v{color:var(--red)}
+.help,.note{color:var(--muted);font-size:12px;line-height:1.5}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+button{height:43px;border:0;border-radius:10px;padding:0 16px;background:linear-gradient(100deg,var(--blue),var(--cyan));color:#061019;font-weight:900;cursor:pointer}
+button.secondary{background:#172239;color:var(--text);border:1px solid var(--line)}
+.component{border:1px solid var(--line);background:#0a111e;border-radius:14px;padding:13px;margin-top:10px}
+.component-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+.remove{height:32px;padding:0 10px;background:#211521;color:#ff91a3;border:1px solid #543044}
+.component-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.component-grid label{margin-top:4px}.component-grid input{height:38px;font-size:13px}
+.formula{margin-top:12px;padding:12px;background:#080d16;border:1px solid var(--line);border-radius:12px;font:12px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;color:#dce8f8}
+.status{min-height:20px;color:var(--muted);font-size:12px;margin-top:10px}
+svg{width:100%;display:block;background:#080d16;border:1px solid var(--line);border-radius:13px}
+@media(max-width:850px){.results{grid-template-columns:1fr 1fr}.component-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){body{padding:12px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.row{grid-template-columns:1fr}.component-grid{grid-template-columns:1fr}.results{grid-template-columns:1fr 1fr}h1{font-size:27px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="tag">BABFT • PHYSICS LAB</div>
+  <h1>Mass & Pivot Calculator</h1>
+  <div class="sub">Build realistic counterweights from multiple blocks, including L-shapes and other irregular layouts. Calculate mass, density, volume, center of mass and pivot torque.</div>
+</header>
 
 <div class="grid">
-<section class="card"><h2>① Main / Beam</h2>
-<label>Beam total mass</label><input id="bm" type="number" step="any" value="6876.601" min="0">
-<label>Pivot → beam center (studs)</label><input id="bd" type="number" step="any" value="104.5" min="0">
-<div class="help">This is the beam's perpendicular lever-arm distance.</div></section>
-
-<section class="card"><h2>② Counterweight</h2>
-<label>Pivot → counterweight center (studs)</label><input id="cd" type="number" step="any" value="5" min="0">
-<label>Counterweight size (X × Y × Z)</label>
-<div class="row"><input id="sx" type="number" value="30" step="any" min=".0001"><input id="sy" type="number" value="30" step="any" min=".0001"></div>
-<label>Z size</label><input id="sz" type="number" value="10" step="any" min=".0001">
+<section class="card">
+<h2>① Main / Beam Side</h2>
+<label>Total beam mass</label>
+<input id="beamMass" type="number" step="any" value="6876.601" min="0">
+<label>Pivot → beam center of mass (studs)</label>
+<input id="beamDist" type="number" step="any" value="104.5" min="0">
+<p class="help">This is the perpendicular lever-arm distance from the pivot to the beam's center of mass.</p>
 </section>
 
-<section class="card"><h2>③ Current Counterweight</h2>
-<label>Current mass</label><input id="cm" type="number" value="628" step="any" min="0">
-<label>Current density (optional)</label><input id="cdensity" type="number" step="any" min="0">
-<div class="help">Compare your current counterweight against the calculated requirement.</div></section>
-
-<section class="card"><h2>④ Calculation Mode</h2>
-<label>Mode</label><select id="mode"><option value="balance">Balance pivot</option><option value="density">Find density from target mass</option><option value="mass">Find mass from density</option></select>
-<label>Target mass</label><input id="tm" type="number" value="3925" step="any" min="0">
-<label>Density</label><input id="den" type="number" value="49.0625" step="any" min="0">
+<section class="card">
+<h2>② Counterweight Calculation</h2>
+<label>Counterweight calculation mode</label>
+<select id="mode">
+  <option value="uniform">Find one density for all counterweight blocks</option>
+  <option value="individual">Use each block's own density</option>
+</select>
+<label>Current / existing density (uniform mode)</label>
+<input id="uniformDensity" type="number" step="any" value="15.969" min="0">
+<p class="help">Uniform mode finds the density required for the whole counterweight shape to balance. Individual mode calculates the actual mass using each block's density.</p>
 </section>
 
-<section class="card full"><h2>Live Results</h2>
+<section class="card full">
+<h2>③ Counterweight Components</h2>
+<p class="help">Add every block that makes up the counterweight. X is the left/right position of that block's center from the pivot. Y is its height/vertical position and is recorded for the 2D center-of-mass calculation.</p>
+<div id="components"></div>
+<div class="actions">
+  <button id="add">＋ Add block</button>
+  <button class="secondary" id="reset">Reset example</button>
+</div>
+</section>
+
+<section class="card full">
+<h2>④ Live Results</h2>
 <div class="results">
-<div class="metric good"><div class="k">Required CW mass</div><div class="v" id="req">—</div></div>
-<div class="metric good"><div class="k">Required density</div><div class="v" id="rd">—</div></div>
-<div class="metric"><div class="k">Volume</div><div class="v" id="vol">—</div></div>
-<div class="metric"><div class="k">Beam torque</div><div class="v" id="bt">—</div></div>
-<div class="metric"><div class="k">Current CW torque</div><div class="v" id="ct">—</div></div>
-<div class="metric"><div class="k">Torque difference</div><div class="v" id="td">—</div></div>
-<div class="metric"><div class="k">Balance ratio</div><div class="v" id="ratio">—</div></div>
-<div class="metric gold"><div class="k">Mass to add/remove</div><div class="v" id="delta">—</div></div>
-</div><div class="status" id="status"></div></section>
-
-<section class="card full"><h2>Pivot Diagram</h2>
-<svg viewBox="0 0 900 190" aria-label="Lever balance diagram">
-<line x1="450" y1="25" x2="450" y2="155" stroke="#51e7ff" stroke-width="2"/>
-<polygon points="428,155 472,155 450,125" fill="#51e7ff"/>
-<line x1="450" y1="88" x2="115" y2="88" stroke="#718cff" stroke-width="7" stroke-linecap="round"/>
-<line x1="450" y1="88" x2="785" y2="88" stroke="#63ee9e" stroke-width="7" stroke-linecap="round"/>
-<circle cx="115" cy="88" r="23" fill="#121c30" stroke="#718cff" stroke-width="3"/><circle cx="785" cy="88" r="23" fill="#121c30" stroke="#63ee9e" stroke-width="3"/>
-<text x="115" y="92" fill="white" text-anchor="middle" font-size="11">CW</text><text x="785" y="92" fill="white" text-anchor="middle" font-size="11">BEAM</text>
-<text x="450" y="178" fill="#51e7ff" text-anchor="middle" font-size="12">PIVOT</text>
-</svg>
-<div class="formula">Balance: M₁ × D₁ = M₂ × D₂<br>Required CW mass = (Beam mass × Beam distance) ÷ CW distance<br>Density = Mass ÷ Volume<br>Volume = X × Y × Z</div>
+  <div class="metric good"><div class="k">Required CW mass</div><div class="v" id="requiredMass">—</div></div>
+  <div class="metric good"><div class="k">Required uniform density</div><div class="v" id="requiredDensity">—</div></div>
+  <div class="metric"><div class="k">Total CW volume</div><div class="v" id="totalVolume">—</div></div>
+  <div class="metric"><div class="k">Current CW mass</div><div class="v" id="currentMass">—</div></div>
+  <div class="metric"><div class="k">Beam torque</div><div class="v" id="beamTorque">—</div></div>
+  <div class="metric"><div class="k">CW torque</div><div class="v" id="cwTorque">—</div></div>
+  <div class="metric"><div class="k">Torque difference</div><div class="v" id="torqueDifference">—</div></div>
+  <div class="metric warn"><div class="k">Mass to add/remove</div><div class="v" id="massDelta">—</div></div>
+</div>
+<div class="results" style="margin-top:10px">
+  <div class="metric"><div class="k">CW center X</div><div class="v" id="comX">—</div></div>
+  <div class="metric"><div class="k">CW center Y</div><div class="v" id="comY">—</div></div>
+  <div class="metric"><div class="k">Balance ratio</div><div class="v" id="ratio">—</div></div>
+  <div class="metric good"><div class="k">Status</div><div class="v" id="statusShort">—</div></div>
+</div>
+<div class="status" id="status" aria-live="polite"></div>
 </section>
 
-<section class="card"><h2>Center of Mass</h2><p class="help">Signed positions are measured from the pivot. Example: +12.5 and −2.5.</p>
-<div class="row"><div><label>Object A mass</label><input id="am" type="number" value="785" step="any" min="0"></div><div><label>Object A position</label><input id="ap" type="number" value="12.5" step="any"></div></div>
-<div class="row"><div><label>Object B mass</label><input id="bmass" type="number" value="3925" step="any" min="0"></div><div><label>Object B position</label><input id="bp" type="number" value="-2.5" step="any"></div></div>
-<div class="results" style="grid-template-columns:1fr 1fr;margin-top:10px"><div class="metric good"><div class="k">Combined COM</div><div class="v" id="com">—</div></div><div class="metric"><div class="k">Total mass</div><div class="v" id="tot">—</div></div></div></section>
+<section class="card full">
+<h2>⑤ Counterweight Shape / Pivot View</h2>
+<svg viewBox="0 0 900 210" aria-label="Schematic showing counterweight blocks around a pivot">
+  <line x1="450" y1="22" x2="450" y2="178" stroke="#50e8ff" stroke-width="2"/>
+  <polygon points="426,178 474,178 450,143" fill="#50e8ff"/>
+  <text x="450" y="198" text-anchor="middle" fill="#50e8ff" font-size="12">PIVOT / AXIS</text>
+  <line x1="70" y1="105" x2="830" y2="105" stroke="#42516a" stroke-width="2"/>
+  <circle cx="170" cy="105" r="25" fill="#111c30" stroke="#738dff" stroke-width="3"/>
+  <circle cx="730" cy="105" r="25" fill="#111c30" stroke="#62efa0" stroke-width="3"/>
+  <text x="170" y="109" text-anchor="middle" fill="#fff" font-size="11">CW COM</text>
+  <text x="730" y="109" text-anchor="middle" fill="#fff" font-size="11">BEAM COM</text>
+  <text x="450" y="28" text-anchor="middle" fill="#8998ae" font-size="12">Vertical height affects Y-COM, but not the horizontal gravity torque when the pivot axis is horizontal.</text>
+</svg>
+<div class="formula">
+Torque balance: Σ(Mᵢ × Xᵢ) = Beam Mass × Beam Distance<br>
+Block volume: Vᵢ = X-size × Y-size × Z-size<br>
+Block mass: Mᵢ = Densityᵢ × Vᵢ<br>
+Counterweight X-COM: Σ(Mᵢ × Xᵢ) ÷ ΣMᵢ<br>
+Counterweight Y-COM: Σ(Mᵢ × Yᵢ) ÷ ΣMᵢ<br>
+Required uniform density: (Beam Mass × Beam Distance) ÷ Σ(Vᵢ × |Xᵢ|)
+</div>
+</section>
 
-<section class="card"><h2>Height / 3D rule</h2><p class="help">For a horizontal pivot with gravity acting vertically, use the perpendicular horizontal lever arm. Moving a counterweight straight up/down does not change its balancing moment if its lever arm stays the same.</p><p class="help">For another rotation axis, use the perpendicular distance from the object's center of mass to that axis.</p></section>
+<section class="card full">
+<h2>⑥ Two-Object Center of Mass</h2>
+<div class="row">
+<div><label>Object A mass</label><input id="aMass" type="number" value="785" step="any" min="0"></div>
+<div><label>Object A X position</label><input id="aPos" type="number" value="12.5" step="any"></div>
+</div>
+<div class="row">
+<div><label>Object B mass</label><input id="bMass" type="number" value="3925" step="any" min="0"></div>
+<div><label>Object B X position</label><input id="bPos" type="number" value="-2.5" step="any"></div>
+</div>
+<div class="results" style="grid-template-columns:1fr 1fr;margin-top:10px">
+<div class="metric good"><div class="k">Combined X-COM</div><div class="v" id="twoCom">—</div></div>
+<div class="metric"><div class="k">Combined mass</div><div class="v" id="twoMass">—</div></div>
+</div>
+</section>
 
-<section class="card full"><div class="actions"><button id="reset">Reset example</button><button class="alt" id="copy">Copy summary</button></div></section>
-</div></main>
+<section class="card full">
+<div class="actions">
+<button id="copy">Copy calculation summary</button>
+<button class="secondary" id="resetAll">Reset everything</button>
+</div>
+</section>
+</div>
+</main>
 
 <script>
-(()=>{const $=id=>document.getElementById(id), n=id=>{let x=Number($(id).value);return Number.isFinite(x)?x:0},
-f=x=>Number.isFinite(x)?x.toLocaleString(undefined,{maximumFractionDigits:5}):"—";
-function calc(){
- let bm=n("bm"),bd=n("bd"),cd=n("cd"),v=n("sx")*n("sy")*n("sz"),cur=n("cm"),bt=bm*bd,req=cd>0?bt/cd:NaN,rd=v>0?req/v:NaN,ct=cur*cd;
- $("vol").textContent=f(v);$("bt").textContent=f(bt);$("ct").textContent=f(ct);$("req").textContent=f(req);$("rd").textContent=f(rd);
- $("td").textContent=f(ct-bt);$("ratio").textContent=bt?(ct/bt*100).toFixed(2)+"%":"—";$("delta").textContent=Number.isFinite(req)?(cur>=req?"+":"")+f(cur-req):"—";
- $("status").textContent=cd<=0?"Enter a counterweight distance greater than 0.":v<=0?"Enter positive counterweight dimensions.":Math.abs(ct-bt)<=Math.max(1,bt*.001)?"✓ Very close to balance.":ct<bt?"Counterweight is too light.":"Counterweight is heavier than required.";
- let mode=$("mode").value;if(mode==="density"){$("req").textContent=f(n("tm"));$("rd").textContent=f(v>0?n("tm")/v:NaN)}else if(mode==="mass"){$("req").textContent=f(n("den")*v);$("rd").textContent=f(n("den"))}
- let a=n("am"),b=n("bmass"),t=a+b,c=t?(a*n("ap")+b*n("bp"))/t:NaN;$("com").textContent=f(c)+" studs";$("tot").textContent=f(t);
+(() => {
+const $=id=>document.getElementById(id);
+const num=(id)=>{const x=Number($(id).value);return Number.isFinite(x)?x:0};
+const fmt=x=>Number.isFinite(x)?x.toLocaleString(undefined,{maximumFractionDigits:5}):"—";
+let componentId=0;
+
+function addComponent(data={}){
+  componentId++;
+  const el=document.createElement("div");
+  el.className="component";
+  el.dataset.id=componentId;
+  el.innerHTML=`
+    <div class="component-top">
+      <h3>Block ${componentId}</h3>
+      <button type="button" class="remove">Remove</button>
+    </div>
+    <div class="component-grid">
+      <div><label>X size</label><input class="sx" type="number" step="any" min="0.0001" value="${data.sx ?? 4}"></div>
+      <div><label>Y size</label><input class="sy" type="number" step="any" min="0.0001" value="${data.sy ?? 4}"></div>
+      <div><label>Z size</label><input class="sz" type="number" step="any" min="0.0001" value="${data.sz ?? 5}"></div>
+      <div><label>Center X from pivot</label><input class="x" type="number" step="any" value="${data.x ?? -2.5}"></div>
+      <div><label>Center Y from pivot</label><input class="y" type="number" step="any" value="${data.y ?? 0}"></div>
+      <div><label>Density</label><input class="density" type="number" step="any" min="0" value="${data.density ?? 15.969}"></div>
+    </div>`;
+  el.querySelector(".remove").addEventListener("click",()=>{el.remove();renumber();calc()});
+  el.querySelectorAll("input").forEach(i=>i.addEventListener("input",calc));
+  $("components").appendChild(el);
+  renumber();
+  calc();
 }
-document.querySelectorAll("input,select").forEach(x=>x.addEventListener("input",calc));$("mode").addEventListener("change",calc);
-$("reset").onclick=()=>{let v={bm:6876.601,bd:104.5,cd:5,sx:30,sy:30,sz:10,cm:628,cdensity:"",tm:3925,den:49.0625,am:785,ap:12.5,bmass:3925,bp:-2.5};for(let k in v)$(k).value=v[k];$("mode").value="balance";calc()};
-$("copy").onclick=()=>{let s=`BABFT Mass & Pivot Calculator\nBeam mass: ${$("bm").value}\nBeam distance: ${$("bd").value}\nCW distance: ${$("cd").value}\nCW volume: ${$("vol").textContent}\nRequired CW mass: ${$("req").textContent}\nRequired density: ${$("rd").textContent}\nBeam torque: ${$("bt").textContent}\nCurrent CW torque: ${$("ct").textContent}\nBalance ratio: ${$("ratio").textContent}`;if(navigator.clipboard)navigator.clipboard.writeText(s).then(()=>$("status").textContent="✓ Summary copied.");else{$("status").textContent="Copy is unavailable in this browser.";}};calc()})();
-</script></body></html>
+function renumber(){[...$("components").children].forEach((e,i)=>e.querySelector("h3").textContent="Block "+(i+1))}
+function blocks(){
+  return [...$("components").children].map(e=>({
+    sx:Number(e.querySelector(".sx").value)||0,
+    sy:Number(e.querySelector(".sy").value)||0,
+    sz:Number(e.querySelector(".sz").value)||0,
+    x:Number(e.querySelector(".x").value)||0,
+    y:Number(e.querySelector(".y").value)||0,
+    density:Number(e.querySelector(".density").value)||0
+  }));
+}
+function calc(){
+  const bm=num("beamMass"),bd=num("beamDist"),beamTorque=bm*bd, bs=blocks();
+  const mode=$("mode").value, uniform=num("uniformDensity");
+  let volume=0,currentMass=0,weightedX=0,weightedY=0,currentTorque=0,volumeMoment=0;
+  bs.forEach(b=>{
+    const v=b.sx*b.sy*b.sz;
+    volume+=v;
+    volumeMoment+=v*Math.abs(b.x);
+    const m=mode==="uniform"?uniform*v:b.density*v;
+    currentMass+=m; weightedX+=m*b.x; weightedY+=m*b.y; currentTorque+=m*Math.abs(b.x);
+  });
+  const requiredMass=(bd>0&&bd>=0)?beamTorque/(Math.max(Math.abs(bs.length?Math.max(...bs.map(b=>Math.abs(b.x))):0),1e-12)):NaN;
+  // Required mass above is based on the actual component lever geometry only when density is uniform.
+  const requiredDensity=(volumeMoment>0)?beamTorque/volumeMoment:NaN;
+  const targetUniformMass=Number.isFinite(requiredDensity)?requiredDensity*volume:NaN;
+  const comX=currentMass>0?weightedX/currentMass:NaN;
+  const comY=currentMass>0?weightedY/currentMass:NaN;
+  const torqueDiff=currentTorque-beamTorque;
+  const ratio=beamTorque>0?currentTorque/beamTorque:NaN;
+  const delta=Number.isFinite(targetUniformMass)?currentMass-targetUniformMass:NaN;
+
+  $("totalVolume").textContent=fmt(volume);
+  $("currentMass").textContent=fmt(currentMass);
+  $("beamTorque").textContent=fmt(beamTorque);
+  $("cwTorque").textContent=fmt(currentTorque);
+  $("torqueDifference").textContent=fmt(torqueDiff);
+  $("ratio").textContent=Number.isFinite(ratio)?(ratio*100).toFixed(2)+"%":"—";
+  $("comX").textContent=fmt(comX)+" studs";
+  $("comY").textContent=fmt(comY)+" studs";
+  $("requiredDensity").textContent=fmt(requiredDensity);
+  $("requiredMass").textContent=fmt(targetUniformMass);
+  $("massDelta").textContent=Number.isFinite(delta)?(delta>=0?"+":"")+fmt(delta):"—";
+
+  let text="";
+  if(!bs.length) text="Add at least one counterweight block.";
+  else if(bd<=0) text="Beam distance must be greater than 0.";
+  else if(volume<=0) text="All block dimensions must be greater than 0.";
+  else if(volumeMoment<=0) text="At least one counterweight block needs a non-zero horizontal distance from the pivot.";
+  else if(Math.abs(torqueDiff)<=Math.max(1,beamTorque*.001)) text="✓ Current counterweight is very close to balance.";
+  else text=currentTorque<beamTorque?"Counterweight is too light / has too little torque.":"Counterweight has too much torque.";
+  $("status").textContent=text;
+  $("statusShort").textContent=text.startsWith("✓")?"BALANCED":text.startsWith("Add")||text.startsWith("Beam")||text.startsWith("All")||text.startsWith("At least")?"CHECK":"UNBALANCED";
+
+  const a=num("aMass"),b=num("bMass"),total=a+b,com=total?(a*num("aPos")+b*num("bPos"))/total:NaN;
+  $("twoCom").textContent=fmt(com)+" studs";$("twoMass").textContent=fmt(total);
+}
+["beamMass","beamDist","uniformDensity","aMass","aPos","bMass","bPos"].forEach(id=>$(id).addEventListener("input",calc));
+$("mode").addEventListener("change",calc);
+
+$("add").addEventListener("click",()=>addComponent());
+$("reset").addEventListener("click",()=>{
+  $("components").innerHTML="";componentId=0;
+  addComponent({sx:30,sy:30,sz:5,x:-2.5,y:0,density:15.969});
+  addComponent({sx:30,sy:5,sz:10,x:-10,y:-5,density:15.969});
+});
+$("resetAll").addEventListener("click",()=>{
+  $("beamMass").value=6876.601;$("beamDist").value=104.5;$("uniformDensity").value=15.969;
+  $("aMass").value=785;$("aPos").value=12.5;$("bMass").value=3925;$("bPos").value=-2.5;
+  $("mode").value="uniform";$("reset").click();
+});
+$("copy").addEventListener("click",()=>{
+  const s=`BABFT Mass & Pivot Calculator
+Beam mass: ${$("beamMass").value}
+Beam distance: ${$("beamDist").value} studs
+Counterweight blocks: ${$("components").children.length}
+Counterweight volume: ${$("totalVolume").textContent}
+Required uniform density: ${$("requiredDensity").textContent}
+Required counterweight mass: ${$("requiredMass").textContent}
+Current counterweight mass: ${$("currentMass").textContent}
+Beam torque: ${$("beamTorque").textContent}
+Counterweight torque: ${$("cwTorque").textContent}
+Torque difference: ${$("torqueDifference").textContent}
+Counterweight X-COM: ${$("comX").textContent}
+Counterweight Y-COM: ${$("comY").textContent}
+Balance ratio: ${$("ratio").textContent}`;
+  if(navigator.clipboard) navigator.clipboard.writeText(s).then(()=>{$("status").textContent="✓ Calculation summary copied."});
+});
+$("reset").click();
+})();
+</script>
+</body>
+</html>
