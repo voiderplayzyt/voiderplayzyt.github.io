@@ -86,7 +86,6 @@ footer{margin-top:45px;text-align:center;color:#66758c;font-size:12px}
     <div class="brand"><div class="logo">VP</div><span>VOIDER PLAYZ</span></div>
     <div class="status">● SYSTEM ONLINE</div>
   </header>
-
   <section class="hero">
     <div class="eyebrow">DIGITAL TOOL HUB</div>
     <h1>WEB PROJECTS</h1>
@@ -96,57 +95,30 @@ footer{margin-top:45px;text-align:center;color:#66758c;font-size:12px}
       <input id="search" type="search" placeholder="Search websites..." aria-label="Search websites">
     </div>
   </section>
-
   <section>
     <div class="section-head">
       <h2>Available Projects</h2>
       <div class="count" id="count"></div>
     </div>
-
     <div class="grid" id="grid">
-      <!--
-        ADD NEW WEBSITES HERE.
-        Copy one <a class="card"...> block and change:
-        1. href = the path to your website
-        2. data-name = search keywords
-        3. icon
-        4. title
-        5. description
-      -->
-
       <a class="card" href="BABFT-Mass-Pivot-Calculator/" data-name="babft mass pivot calculator physics bowling">
-        <div>
-          <div class="icon">⚖</div>
-          <h3>BABFT Mass & Pivot</h3>
-          <p>Calculate torque, counterweight mass, density, volume and center of mass.</p>
-        </div>
+        <div><div class="icon">⚖</div><h3>BABFT Mass &amp; Pivot</h3><p>Calculate torque, counterweight mass, density, volume and center of mass.</p></div>
         <div class="open">OPEN PROJECT →</div>
       </a>
-
-      <!-- Example:
-      <a class="card" href="my-new-tool/" data-name="my new tool calculator">
-        <div>
-          <div class="icon">◈</div>
-          <h3>My New Tool</h3>
-          <p>A short description of what this website does.</p>
-        </div>
+      <a class="card" href="Word-Number-Guesser/" data-name="word number guesser wordle puzzle game solver green yellow red animal food object">
+        <div><div class="icon">▦</div><h3>Word &amp; Number Guesser</h3><p>Pick a secret, solve Wordle-style guesses, and track exact colors or green/yellow totals.</p></div>
         <div class="open">OPEN PROJECT →</div>
       </a>
-      -->
     </div>
-
     <div class="empty" id="empty">No projects match your search.</div>
   </section>
-
   <footer>VOIDER PLAYZ • WEB HUB</footer>
 </div>
-
 <script>
 const search=document.getElementById("search");
 const cards=[...document.querySelectorAll(".card")];
 const count=document.getElementById("count");
 const empty=document.getElementById("empty");
-
 function filter(){
   const q=search.value.trim().toLowerCase();
   let visible=0;
