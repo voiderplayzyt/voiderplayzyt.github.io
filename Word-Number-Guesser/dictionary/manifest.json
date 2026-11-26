@@ -1,0 +1,27 @@
+{
+  "total": 230366,
+  "length_counts": {
+    "2": 475,
+    "3": 2815,
+    "4": 8384,
+    "5": 18582,
+    "6": 29270,
+    "7": 35186,
+    "8": 34075,
+    "9": 30560,
+    "10": 24897,
+    "11": 17822,
+    "12": 11954,
+    "13": 7562,
+    "14": 4282,
+    "15": 2352,
+    "16": 1192,
+    "17": 581,
+    "18": 240,
+    "19": 112,
+    "20": 25
+  },
+  "min_length": 2,
+  "max_length": 20,
+  "notes": "English-language spellings gathered from SCOWL/Hunspell, CMUdict, and TextBlob English lexicon with regular inflections. Not every possible English word; includes uncommon terms and names."
+}

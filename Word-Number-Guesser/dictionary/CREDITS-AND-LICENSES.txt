@@ -1,0 +1,56 @@
+Dictionary Sources and License Notices
+======================================
+
+This word dictionary combines and normalizes alphabetic entries (2–20 letters) from:
+
+1. SCOWL (Spell Checker Oriented Word Lists), as distributed in the Debian hunspell-en-us dictionary.
+   Copyright 2000-2011 Kevin Atkinson and upstream word-list contributors.
+   Permission to use, copy, modify, distribute and sell these word lists, the associated scripts,
+   the output created from the scripts, and its documentation for any purpose is hereby granted
+   without fee, provided that the above copyright notice appears in all copies and that both
+   that copyright notice and this permission notice appear in supporting documentation.
+   The word-list material is provided without warranty.
+   Source: https://wordlist.sourceforge.net/ and Debian hunspell-en-us package.
+
+2. CMU Pronouncing Dictionary (via Python cmudict package, pronunciation keys used as words).
+   CMU Sphinx copyright 1995–2014 Carnegie Mellon University; 2014–2015 Alpha Cephei Inc.
+   BSD 2-clause license. The following BSD license notice accompanies the distributed data:
+
+   Redistribution and use in source and binary forms, with or without modification,
+   are permitted provided that the following conditions are met:
+
+   1. Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+   2. Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+
+   THIS SOFTWARE IS PROVIDED BY CARNEGIE MELLON UNIVERSITY "AS IS" AND ANY
+   EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   DISCLAIMED. IN NO EVENT SHALL CARNEGIE MELLON UNIVERSITY NOR ITS EMPLOYEES
+   BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+   THE POSSIBILITY OF SUCH DAMAGE.
+
+   License: https://opensource.org/licenses/BSD-2-Clause
+   Source: https://github.com/cmusphinx/cmudict
+
+3. TextBlob English POS lexicon (first-column entries), including sources from Eric Brill's
+   rule-based tagger (MIT / University of Pennsylvania) and Carnegie Mellon University's
+   Twitter POS annotated data (CC BY 3.0). Derivative entries include regular inflections.
+   TextBlob file: textblob/en/en-lexicon.txt
+   Project: https://github.com/sloria/TextBlob
+   Twitter POS corpus attribution:
+   Kevin Gimpel, Nathan Schneider, Brendan O'Connor et al. (2011), Part-of-Speech Tagging
+   for Twitter: Annotation, Features, and Experiments, ACL 2011.
+   CC BY 3.0: https://creativecommons.org/licenses/by/3.0/
+
+These word lists are a compilation, not an authority on spelling or the complete set of
+all English words. Some obscure names, unusual forms, slang, or inflections can appear.
+Normal mode accepts all alphabetic entries of the selected length in this bundled list;
+topic lists are separately curated and are not exhaustive.
