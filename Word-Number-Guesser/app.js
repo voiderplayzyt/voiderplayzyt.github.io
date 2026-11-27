@@ -5,6 +5,7 @@ const state={mode:'WORD',feedback:'exact',all:[],possible:[],secret:'',secretVis
 const lengthCounts={"2":475,"3":2815,"4":8384,"5":18582,"6":29270,"7":35186,"8":34075,"9":30560,"10":24897,"11":17822,"12":11954,"13":7562,"14":4282,"15":2352,"16":1192,"17":581,"18":240,"19":112,"20":25};
 const TOTAL_WORDS=230366;
 const dictionaryCache=new Map();
+let nounsPromise=null;
 for(let n=2;n<=20;n++){const opt=document.createElement('option');opt.value=String(n);opt.textContent=`${n} letters (${lengthCounts[n].toLocaleString()} words)`;if(n===5)opt.selected=true;el.wordLength.append(opt);}
 for(let n=1;n<=8;n++){const opt=document.createElement('option');opt.value=String(n);opt.textContent=n+' digit'+(n===1?'':'s');if(n===4)opt.selected=true;el.digits.append(opt);}
 const normalize=x=>String(x||'').trim().toUpperCase();
@@ -41,11 +42,25 @@ async function getDictionary(n){
  dictionaryCache.set(n,promise);
  try{return await promise;}catch(e){dictionaryCache.delete(n);throw e;}
 }
+async function getNouns(n){
+ if(!nounsPromise){
+  nounsPromise=(async()=>{
+   const path='dictionary/nouns.txt';
+   const response=await fetch(path);
+   if(!response.ok)throw Error(`Could not load ${path} (HTTP ${response.status}). Upload the nouns.txt file.`);
+   const text=await response.text();
+   return [...new Set(text.split(/\s+/).map(w=>w.trim().toUpperCase()).filter(w=>/^[A-Z]{2,20}$/.test(w)))].sort();
+  })();
+ }
+ try{return (await nounsPromise).filter(w=>w.length===n);}
+ catch(e){nounsPromise=null;throw e;}
+}
 function parseCustom(){return el.customWords.value.toUpperCase().split(/[^A-Z]+/).filter(Boolean);}
 async function createPool(){
  if(state.mode==='WORD'){
   const n=len(),topic=el.topic.value;
   if(topic==='NORMAL')return await getDictionary(n);
+   if(topic==='NOUNS')return await getNouns(n);
   if(topic==='CUSTOM')return cleanList(parseCustom());
   const words=topic==='ALL_TOPICS'?Object.values(TOPIC_WORDS).flat():TOPIC_WORDS[topic]||[];
   return cleanList(words);
@@ -56,7 +71,7 @@ async function createPool(){
  return Array.from({length:b-a+1},(_,i)=>String(a+i).padStart(n,'0'));
 }
 function secretCandidates(){
- if(state.mode!=='WORD'||el.topic.value!=='NORMAL'||el.secretDifficulty.value==='ALL')return state.all;
+ if(state.mode!=='WORD'||!['NORMAL','NOUNS'].includes(el.topic.value)||el.secretDifficulty.value==='ALL')return state.all;
  const allowed=new Set(state.all),common=Object.values(TOPIC_WORDS).flat().filter(w=>allowed.has(w));
  return common.length?[...new Set(common)]:state.all;
 }
@@ -76,7 +91,7 @@ function showSecret(){el.secretValue.textContent=state.secretVisible?state.secre
 function updateCounts(){const g=Number(el.green.value),y=Number(el.yellow.value),r=len()-g-y;el.red.value=r>=0?String(r):'—';el.total.textContent=`${len()} tiles total`+(r<0?' · TOO MANY COLORS':'');}
 function validateGuess(s){if(s.length!==len()||!goodChars(s))throw Error(`Guess must be exactly ${len()} ${state.mode==='WORD'?'letters':'digits'}.`);}
 function startingGuess(){
- if(state.mode!=='WORD'||el.topic.value!=='NORMAL'||state.history.length)return null;
+ if(state.mode!=='WORD'||!['NORMAL','NOUNS'].includes(el.topic.value)||state.history.length)return null;
  const starts={3:'ARE',4:'RATE',5:'SLATE',6:'CANDLE',7:'STATION',8:'TRIANGLE',9:'CHOCOLATE',10:'UNDERSTAND'};
  const w=starts[len()];return w&&state.all.includes(w)?w:null;
 }
@@ -134,14 +149,14 @@ function setupPlaceholders(){const example=state.mode==='WORD'?'TIGER':'5678';el
 function isMatch(answer,entry){const pattern=feedback(answer,entry.guess);if(entry.kind==='exact')return pattern===entry.code;const [g,y]=sums(pattern);return g===entry.green&&y===entry.yellow;}
 async function newRound(){
  const current=++state.sequence;state.busy=true;el.poolInfo.textContent=state.mode==='WORD'&&el.topic.value==='NORMAL'?`Loading ${lengthCounts[wordLen()].toLocaleString()} words of length ${wordLen()}…`:'Preparing round…';el.configStatus.textContent=state.mode==='WORD'?'WORD • '+el.topic.value:`NUMBER • ${el.digits.value} DIGITS`;
- el.secretModeRow.classList.toggle('hidden-section',state.mode!=='WORD'||el.topic.value!=='NORMAL');
+ el.secretModeRow.classList.toggle('hidden-section',state.mode!=='WORD'||!['NORMAL','NOUNS'].includes(el.topic.value));
  el.customSetup.classList.toggle('hidden-section',state.mode!=='WORD'||el.topic.value!=='CUSTOM');
  try{
   const all=await createPool();if(current!==state.sequence)return;
   if(!all.length)throw Error(`No ${len()}-${state.mode==='WORD'?'letter words':'digit numbers'} found for this selection. Try a different length or topic.`);
   state.all=all;state.possible=all.slice();state.history=[];state.secret=random(secretCandidates());state.secretVisible=false;
   state.busy=false;el.friendGuess.value='';el.judgeResult.replaceChildren();el.solverGuess.value='';el.codeFeedback.value='R'.repeat(len());el.green.value=0;el.yellow.value=0;updateCounts();setupPlaceholders();showSecret();render();suggest(true);
-  el.poolInfo.textContent=`${state.all.length.toLocaleString()} possible ${state.mode==='WORD'?'words':'numbers'} of ${len()} ${state.mode==='WORD'?'letters':'digits'}.`+(state.mode==='WORD'&&el.topic.value==='NORMAL'?` Bundled dictionary: ${TOTAL_WORDS.toLocaleString()} entries total.`:'');
+  el.poolInfo.textContent=`${state.all.length.toLocaleString()} possible ${state.mode==='WORD'?'words':'numbers'} of ${len()} ${state.mode==='WORD'?'letters':'digits'}.`+(state.mode==='WORD'&&el.topic.value==='NORMAL'?` Bundled dictionary: ${TOTAL_WORDS.toLocaleString()} entries total.`:state.mode==='WORD'&&el.topic.value==='NOUNS'?' From the bundled noun lexicon.':'');
   say('New round started! Try the suggestion, then enter the feedback.','good');
  }catch(e){if(current!==state.sequence)return;state.busy=false;state.all=[];state.possible=[];state.secret='';state.suggested='';el.nextMetric.textContent='—';render();fail(e.message+(location.protocol==='file:'?' Run this website on GitHub Pages or a local HTTP server (not by double-clicking the HTML).':''));}
 }
@@ -179,7 +194,7 @@ function judge(){
 }
 function updateBounds(){const n=len(),first=n===1?0:10**(n-1),last=Math.min(10**n-1,first+9999);el.min.min='0';el.max.min='0';el.min.max=String(10**n-1);el.max.max=String(10**n-1);el.min.value=String(first);el.max.value=String(last);newRound();}
 el.wordMode.addEventListener('click',()=>switchMode('WORD'));el.numberMode.addEventListener('click',()=>switchMode('NUMBER'));
-el.topic.addEventListener('change',newRound);el.secretDifficulty.addEventListener('change',()=>{if(state.mode==='WORD'&&el.topic.value==='NORMAL')newRound();});el.wordLength.addEventListener('change',newRound);el.digits.addEventListener('change',updateBounds);el.min.addEventListener('change',newRound);el.max.addEventListener('change',newRound);el.customWords.addEventListener('change',()=>{if(el.topic.value==='CUSTOM')newRound();});
+el.topic.addEventListener('change',newRound);el.secretDifficulty.addEventListener('change',()=>{if(state.mode==='WORD'&&['NORMAL','NOUNS'].includes(el.topic.value))newRound();});el.wordLength.addEventListener('change',newRound);el.digits.addEventListener('change',updateBounds);el.min.addEventListener('change',newRound);el.max.addEventListener('change',newRound);el.customWords.addEventListener('change',()=>{if(el.topic.value==='CUSTOM')newRound();});
 el.customFile.addEventListener('change',async()=>{const f=el.customFile.files?.[0];if(!f)return;el.customWords.value=await f.text();if(el.topic.value==='CUSTOM')newRound();});
 $('newRound').addEventListener('click',newRound);
 $('resetSolver').addEventListener('click',()=>{if(!state.all.length)return;state.history=[];state.possible=state.all.slice();el.solverGuess.value='';el.codeFeedback.value='R'.repeat(len());render();suggest(true);say('Clues reset. Your secret stays the same.','good');});
