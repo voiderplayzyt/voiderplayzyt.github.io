@@ -1,0 +1,3 @@
+GitHub connection test, November 27, 2026.
+Stage 1: file creation.
+Temporary test file — safe to delete.
