@@ -35,7 +35,21 @@ label{display:block;color:var(--muted);font-size:11px;font-weight:800;margin:12p
    <section class="card" aria-label="Round setup"><div class="card-top"><h2>① Round setup</h2><span class="small-tag" id="configStatus">WORD • NORMAL</span></div>
     <div id="wordSetup"><div class="row"><div><label for="topic">Word topic</label><select id="topic">
 <option value="NORMAL">🌍 Normal — Everything (any word)</option>
-<option value="NOUNS">📖 Nouns — People, places, things &amp; ideas</option>
+<optgroup label="Noun types — excludes verbs">
+<option value="NOUN_SINGULAR">📘 Nouns — Singular (not verbs, not plurals)</option>
+<option value="NOUN_PLURAL">📗 Nouns — Plural (not verbs)</option>
+<option value="NOUN_COMMON">📝 Nouns — Common</option>
+<option value="NOUN_PROPER">🏷️ Nouns — Proper names</option>
+<option value="NOUN_ABSTRACT">💭 Nouns — Abstract</option>
+<option value="NOUN_CONCRETE">🧱 Nouns — Concrete</option>
+<option value="NOUN_COLLECTIVE">👥 Nouns — Collective / groups</option>
+<option value="NOUN_PEOPLE">🧑 Nouns — People</option>
+<option value="NOUN_PLACES">📍 Nouns — Places</option>
+<option value="NOUN_MATERIAL">🧪 Nouns — Material / substances</option>
+<option value="NOUN_COUNTABLE">🔢 Nouns — Countable</option>
+<option value="NOUN_UNCOUNTABLE">🌾 Nouns — Uncountable (curated)</option>
+<option value="NOUN_COMPOUND">🧩 Nouns — Compound (curated)</option>
+</optgroup>
 <option value="ANIMALS">🐾 Animals</option>
 <option value="FOOD">🍕 Food & drinks</option>
 <option value="OBJECTS">📦 Objects</option>
@@ -63,12 +77,12 @@ label{display:block;color:var(--muted);font-size:11px;font-weight:800;margin:12p
 <option value="ALL_TOPICS">✨ All topics (curated)</option>
 <option value="CUSTOM">✎ Custom word list</option>
 </select></div><div><label for="wordLength">Word length</label><select id="wordLength"></select></div></div>   <div id="secretModeRow">
-    <label for="secretDifficulty">Random secret selection (Normal / Nouns modes)</label>
+    <label for="secretDifficulty">Random secret selection (Normal &amp; noun topics)</label>
     <select id="secretDifficulty">
       <option value="COMMON">Common / recognizable words (recommended)</option>
       <option value="ALL">Anything from the full dictionary (very hard!)</option>
     </select>
-    <p class="hint">Both choices search every word in the selected topic. Common mode picks more recognizable secrets; All can pick rare nouns. Noun entries are from an English part-of-speech lexicon.</p>
+    <p class="hint">Both choices solve from all words of the selected topic. Common prefers familiar secret words when possible. Noun categories exclude recognized verb forms and use WordNet noun classifications; some words may have other grammatical uses.</p>
    </div>
 <div id="customSetup" class="hidden-section"><label for="customWords">Custom words (separated by spaces, commas or lines)</label><textarea id="customWords" spellcheck="false" placeholder="TIGER ZEBRA HORSE BISON PANDA"></textarea><label for="customFile">Or load a .txt word list</label><input type="file" id="customFile" accept=".txt,text/plain"></div></div>
     <div id="numberSetup" class="hidden-section"><div class="row three"><div><label for="digits">Digits</label><select id="digits"></select></div><div><label for="minNumber">Minimum</label><input id="minNumber" type="number" min="0" step="1" value="1000"></div><div><label for="maxNumber">Maximum</label><input id="maxNumber" type="number" min="0" step="1" value="9999"></div></div><p class="hint">All candidates use the selected digit count. Leading zeroes are supported (e.g. 0007). Maximum range size: 100,000.</p></div>
