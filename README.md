@@ -43,7 +43,7 @@ A guessing game and clue tracker with separate **word** and **number** modes. Ch
 These projects run in your browser and are hosted with **GitHub Pages**.
 
 <p>
-  <img alt="HTML" src="https://img.shields.io/badge/HTML- web%20pages-e34f26?logo=html5&logoColor=white">
+  <img alt="HTML" src="https://img.shields.io/badge/HTML-Web%20pages-e34f26?logo=html5&logoColor=white">
   <img alt="CSS" src="https://img.shields.io/badge/CSS-styling-1572b6?logo=css3&logoColor=white">
   <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-interactivity-f7df1e?logo=javascript&logoColor=222">
   <img alt="GitHub Pages" src="https://img.shields.io/badge/Hosted%20on-GitHub%20Pages-222?logo=github">
