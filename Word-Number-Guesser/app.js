@@ -24,7 +24,51 @@ async function getNounType(topic,n){
   return categories[topic].filter(w=>w.length===n);
  }catch(e){nounTypesPromise=null;throw e;}
 }
-const isExtendedTopic=()=>state.mode==='WORD'&&(el.topic.value==='NORMAL'||el.topic.value.startsWith('NOUN_'));
+
+ // Non-plural topics are separate from the noun-only modes: verbs and adjectives
+ // remain eligible unless the spelling is also a recognized plural.
+ const NON_PLURAL_SUFFIX='_NOT_PLURAL';
+ const isNonPluralTopic=topic=>topic.endsWith(NON_PLURAL_SUFFIX);
+ const baseTopic=topic=>isNonPluralTopic(topic)?topic.slice(0,-NON_PLURAL_SUFFIX.length):topic;
+ const curatedPlurals=new Set(('GEESE CASHEWS CEREALS CHIPS COOKIES DATES FIGS FRIES OATS PEAS SEEDS TACOS BINOCULARS EARPHONES GLASSES SCISSORS SHOVELS SUNGLASSES TRIPODS DARTS WINDOWS BOOTS GLOVES JEANS PAJAMAS PANTS PYJAMAS SANDALS SHOES SHORTS SOCKS TROUSERS POLICE BONES EARS EYES FEET LIPS LUNGS TEETH TOES ELVES PLIERS CACTI LEAVES').split(' '));
+ const extraPlurals=new Set(('CHILDREN MEN WOMEN PEOPLE MICE LICE OXEN BRETHREN KINE DICE PENNIES PENCE FORMULAE LARVAE ALUMNI ALUMNAE BACTERIA CRITERIA PHENOMENA MEDIA DATA STRATA STIMULI FUNGI NUCLEI SYLLABI RADII INDICES MATRICES VERTICES APPENDICES ANALYSES AXES BASES CRISES DIAGNOSES THESES SYNOPSES OASES PARENTHESES HYPOTHESES ANTITHESES CORPORA GENERA VISCERA BEAUX BUREAUX TABLEAUX CHERUBIM SERAPHIM KNIVES WIVES LIVES WOLVES SHELVES CALVES HALVES HOOVES LOAVES THIEVES DWARVES SCARVES CATS DOGS GAMES GAMERS GERMS HEADPHONES CLOTHES GOODS STAIRS THANKS').split(' '));
+ const nonPluralExceptions=new Set(('AS IS WAS HAS DOES THIS YES HIS ITS US THUS PLUS GAS BUS MINIBUS STATUS VIRUS FOCUS CACTUS OCTOPUS RHINOCEROS WALRUS IBIS MANTIS ALBATROSS COSMOS GRASS GLASS BOSS COMPASS DRESS LENS PASS CLASS RECESS BASS MASS MOSS LOTUS WAITERESS PRINCESS NERVOUS STRESS TENNIS PHYSICS MATHEMATICS ECONOMICS POLITICS ETHICS LOGISTICS LINGUISTICS STATISTICS MECHANICS ELECTRONICS GENETICS OPTICS ACOUSTICS ATHLETICS GYMNASTICS AEROBICS NEWS CHAOS ATLAS CANVAS CANVASS CHESS CROSS LOSS PRESS SUCCESS ACCESS PROCESS ADDRESS BUSINESS WITNESS HAPPINESS FITNESS MADNESS KINDNESS SERIES SPECIES DEER SHEEP FISH MOOSE BISON SALMON TROUT SWINE AIRCRAFT SPACECRAFT').split(' '));
+ for(const k of ['COUNTRIES','CITIES','SPACE'])for(const w of TOPIC_WORDS[k]||[])if(!curatedPlurals.has(w))nonPluralExceptions.add(w);
+ function pluralBaseForms(word){
+  const forms=[];
+  if(word.endsWith('S'))forms.push(word.slice(0,-1));
+  if(word.endsWith('ES'))forms.push(word.slice(0,-2));
+  if(word.endsWith('IES'))forms.push(word.slice(0,-3)+'Y');
+  if(word.endsWith('VES'))forms.push(word.slice(0,-3)+'F',word.slice(0,-3)+'FE');
+  return forms;
+ }
+ async function getNonPluralDictionary(n){
+  const [words,knownPlurals,knownSingulars,...nounLists]=await Promise.all([
+   getDictionary(n),getNounType('NOUN_PLURAL',n),getNounType('NOUN_SINGULAR',n),
+   ...[n-1,n-2,n-3].filter(x=>x>=2).map(getNouns)
+  ]);
+  const pluralSet=new Set(knownPlurals),singularSet=new Set(knownSingulars);
+  const nounBases=new Set(nounLists.flat().concat(Object.values(TOPIC_WORDS).flat()));
+  return words.filter(w=>{
+   if(curatedPlurals.has(w)||extraPlurals.has(w))return false;
+   if(nonPluralExceptions.has(w))return true;
+   if(pluralSet.has(w))return false;
+   if(singularSet.has(w))return true;
+   return !pluralBaseForms(w).some(base=>base.length>=2&&nounBases.has(base));
+  });
+ }
+ // Insert a variant after each original topic, preserving the original order
+ // and leaving the already-typed noun categories and custom mode untouched.
+ for(const option of Array.from(el.topic.options)){
+  const key=option.value;
+  if(key!=='NORMAL'&&key!=='ALL_TOPICS'&&!Object.prototype.hasOwnProperty.call(TOPIC_WORDS,key))continue;
+  const variant=document.createElement('option');
+  variant.value=key+NON_PLURAL_SUFFIX;
+  variant.textContent=key==='NORMAL'?'🌍 Everything - Not Plural':option.textContent+' - Not Plural';
+  option.after(variant);
+ }
+
+const isExtendedTopic=()=>state.mode==='WORD'&&(baseTopic(el.topic.value)==='NORMAL'||el.topic.value.startsWith('NOUN_'));
 
 for(let n=2;n<=20;n++){const opt=document.createElement('option');opt.value=String(n);opt.textContent=`${n} letters (${lengthCounts[n].toLocaleString()} words)`;if(n===5)opt.selected=true;el.wordLength.append(opt);}
 for(let n=1;n<=8;n++){const opt=document.createElement('option');opt.value=String(n);opt.textContent=n+' digit'+(n===1?'':'s');if(n===4)opt.selected=true;el.digits.append(opt);}
@@ -80,11 +124,13 @@ async function createPool(){
  if(state.mode==='WORD'){
   const n=len(),topic=el.topic.value;
   if(topic==='NORMAL')return await getDictionary(n);
+  if(topic==='NORMAL'+NON_PLURAL_SUFFIX)return await getNonPluralDictionary(n);
    if(topic==='NOUNS')return await getNounType('NOUN_SINGULAR',n);
    if(topic.startsWith('NOUN_'))return await getNounType(topic,n);
   if(topic==='CUSTOM')return cleanList(parseCustom());
-  const words=topic==='ALL_TOPICS'?Object.values(TOPIC_WORDS).flat():TOPIC_WORDS[topic]||[];
-  return cleanList(words);
+  const key=baseTopic(topic);
+  const words=key==='ALL_TOPICS'?Object.values(TOPIC_WORDS).flat():TOPIC_WORDS[key]||[];
+  return cleanList(isNonPluralTopic(topic)?words.filter(w=>!curatedPlurals.has(w)&&!extraPlurals.has(w)):words);
  }
  const n=len(),a=Number(el.min.value),b=Number(el.max.value),upper=10**n-1;
  if(!Number.isSafeInteger(a)||!Number.isSafeInteger(b)||a<0||a>upper||b<0||b>upper||b<a)throw Error(`Enter whole-number bounds from 0 to ${upper}, with minimum ≤ maximum.`);
@@ -177,7 +223,7 @@ async function newRound(){
   if(!all.length)throw Error(`No ${len()}-${state.mode==='WORD'?'letter words':'digit numbers'} found for this selection. Try a different length or topic.`);
   state.all=all;state.possible=all.slice();state.history=[];state.secret=random(secretCandidates());state.secretVisible=false;
   state.busy=false;el.friendGuess.value='';el.judgeResult.replaceChildren();el.solverGuess.value='';el.codeFeedback.value='R'.repeat(len());el.green.value=0;el.yellow.value=0;updateCounts();setupPlaceholders();showSecret();render();suggest(true);
-  el.poolInfo.textContent=`${state.all.length.toLocaleString()} possible ${state.mode==='WORD'?'words':'numbers'} of ${len()} ${state.mode==='WORD'?'letters':'digits'}.`+(state.mode==='WORD'&&el.topic.value==='NORMAL'?` Bundled dictionary: ${TOTAL_WORDS.toLocaleString()} entries total.`:state.mode==='WORD'&&el.topic.value.startsWith('NOUN_')?' WordNet-based noun-only category; verb forms excluded.':'');
+  el.poolInfo.textContent=`${state.all.length.toLocaleString()} possible ${state.mode==='WORD'?'words':'numbers'} of ${len()} ${state.mode==='WORD'?'letters':'digits'}.`+(state.mode==='WORD'&&el.topic.value==='NORMAL'?` Bundled dictionary: ${TOTAL_WORDS.toLocaleString()} entries total.`:state.mode==='WORD'&&el.topic.value.startsWith('NOUN_')?' WordNet-based noun-only category; verb forms excluded.':state.mode==='WORD'&&isNonPluralTopic(el.topic.value)?' Recognized plural forms excluded. Ambiguous spellings may remain.':'');
   say('New round started! Try the suggestion, then enter the feedback.','good');
  }catch(e){if(current!==state.sequence)return;state.busy=false;state.all=[];state.possible=[];state.secret='';state.suggested='';el.nextMetric.textContent='—';render();fail(e.message+(location.protocol==='file:'?' Run this website on GitHub Pages or a local HTTP server (not by double-clicking the HTML).':''));}
 }
